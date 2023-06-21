@@ -9,3 +9,9 @@ class BasePost(BaseModel):
 class CreatePost(BasePost):
     class Config:
         orm_mode = True
+
+
+class UpdatePost(BasePost):
+    class Config:
+        orm_mode = True
+

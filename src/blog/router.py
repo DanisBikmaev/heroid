@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, update, delete
 from blog.models import Post
 from database import AsyncSession, get_async_session
-from blog.schemas import CreatePost
+from blog.schemas import CreatePost, UpdatePost
 
 router = APIRouter(
     prefix="/blog",
@@ -25,11 +25,24 @@ async def get_post_by_id(id: int, sesion: AsyncSession = Depends(get_async_sessi
 
 
 @router.post("/")
-async def create_post(new_post: CreatePost, session: AsyncSession = Depends(get_async_session)):
-    stmt = insert(Post).values(**new_post.dict())
+async def create_post(payload: CreatePost, session: AsyncSession = Depends(get_async_session)):
+    stmt = insert(Post).values(**payload.dict())
     await session.execute(stmt)
     await session.commit()
-    return {"status": "success", "data": new_post}
+    return {"status": "success", "data": payload}
 
-# @router.patch("/{id}")
-# async def update_post(new_post: )
+
+@router.patch("/{id}")
+async def update_post(id: int, payload: UpdatePost, session: AsyncSession = Depends(get_async_session)):
+    stmt = update(Post).where(Post.id == id).values(**payload.dict())
+    await session.execute(stmt)
+    await session.commit()
+    return {"status": "success", "data": payload}
+
+
+@router.delete("/{id}")
+async def delete_post(id: int, session: AsyncSession = Depends(get_async_session)):
+    stmt = delete(Post).where(Post.id == id)
+    await session.execute(stmt)
+    await session.commit()
+    return {"status": "success"}
