@@ -1,7 +1,7 @@
 from fastapi import FastAPI
+from blog.router import router as blog_router
 
 app = FastAPI()
 
-@app.get('/')
-async def home():
-    return {"data": "home"}
+
+app.include_router(blog_router)
